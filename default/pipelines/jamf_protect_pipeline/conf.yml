@@ -1,0 +1,63 @@
+output: default
+streamtags:
+  - jamf
+  - protect
+groups: {}
+asyncFuncTimeout: 1000
+functions:
+  - id: serde
+    filter: sourcetype.startsWith("jamf:protect")
+    disabled: null
+    conf:
+      mode: extract
+      type: json
+      srcField: _raw
+      fields:
+        - event_id
+        - event_name
+        - product
+  - id: eval
+    filter: sourcetype==="jamf:protect:web"
+    disabled: null
+    conf:
+      add:
+        - disabled: false
+          name: sourcetype
+          value: 'product === "Network Traffic Stream" ? "jamf:protect:web:traffic" :
+            sourcetype'
+        - disabled: false
+          name: sourcetype
+          value: 'product === "Threat Events Stream" ? "jamf:protect:web:threat" :
+            sourcetype'
+    description: First match on product name for web events
+  - id: lookup
+    filter: sourcetype==="jamf:protect:telemetry"
+    disabled: null
+    conf:
+      matchMode: exact
+      reloadPeriodSec: -1
+      addToEvent: false
+      inFields:
+        - eventField: event_id
+      ignoreCase: false
+      file: jamf_eventcode_to_sourcetype.csv
+      outFields:
+        - lookupField: sourcetype
+          defaultValue: jamf:protect
+    description: Lookup event code first
+  - id: eval
+    filter: sourcetype==="jamf:protect:telemetry"
+    disabled: null
+    conf:
+      add:
+        - disabled: false
+          name: sourcetype
+          value: "[\"LICENSE_INFO_EVENT\", \"SIGNAL_EVENT\",
+            \"APP_METRICS\"].includes(event_name) ?
+            'jamf:protect:telemetry:internal' : sourcetype"
+        - disabled: false
+          name: sourcetype
+          value: "/^AUE_(logout|SESSION_\\w+)/i.test(event_name) ?
+            'jamf:protect:telemetry:time' : sourcetype"
+    description: If no event code matches, match on event name
+description: JAMF Protect pipeline for sourcetype conditioning

@@ -1,0 +1,26 @@
+id: default
+groups: {}
+comments: []
+routes:
+  - id: 7ITFuz
+    name: JAMF Protect
+    final: true
+    disabled: false
+    pipeline: jamf_protect_pipeline
+    description: JAMF Protect parsing and sourcetype conditioning
+    clones: []
+    enableOutputExpression: false
+    outputExpression: null
+    filter: sourcetype.startsWith('jamf:protect')
+    output: default
+  - id: default
+    name: default
+    final: true
+    disabled: false
+    pipeline: main
+    description: ""
+    clones: []
+    enableOutputExpression: false
+    outputExpression: null
+    filter: "true"
+    output: default

@@ -1,0 +1,1 @@
+{"name":"jamf_enterprise_source","version":"1.0.0","minLogStreamVersion":"4.4.0","author":"arcsector","description":"We want to sourcetype JAMF stuff coming in and going out to something like Splunk","displayName":"jamf_enterprise_source","tags":{"streamtags":["jamf","macos","apple"],"dataType":["logs"],"useCase":["routing","filtering"]}}
